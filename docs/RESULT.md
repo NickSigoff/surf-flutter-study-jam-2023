@@ -34,31 +34,31 @@
 
 # Основной экран, работа bottomSheetа
 <p align="center">
-<img src="/docs/results/main_page.gif" width="300" height="400" />
+<img src="/docs/results/main_page.gif" width="400" />
 </p>
 
 # Валидный ввод url
 <p align="center">
-<img src="/docs/results/valid_enter.gif" width="300" height="400"/>
+<img src="/docs/results/valid_enter.gif" width="400" />
 </p>
 
 # Не валидный ввод url
 <p align="center">
-<img src="/docs/results/not_valid_enter.gif" width="300" height="400"/>
+<img src="/docs/results/not_valid_enter.gif" width="400"  />
 </p>
 
 
 # Исчезающая кнопка
 <p align="center">
-<img src="/docs/results/disappear_button.gif" width="300" height="400" />
+<img src="/docs/results/disappear_button.gif" width="400" />
 </p>
 
 # Загрузка файлов
 <p align="center">
-<img src="/docs/results/download.gif" width="300" height="400"/>
+<img src="/docs/results/download.gif" width="400" />
 </p>
 
 # Удаление позиции
 <p align="center">
-<img src="/docs/results/delete.gif" width="300" height="400"/>
+<img src="/docs/results/delete.gif" width="400" />
 </p>
