@@ -44,6 +44,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                     TicketModel(
                       url: state.url,
                       status: FileStatus.notUploaded,
+                      ticketName: _nameController.text,
                     ),
                   ),
                 );
@@ -56,6 +57,13 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              TextField(
+                controller: _nameController,
+                style: TextStyle(color: Colors.black.withOpacity(.8)),
+                decoration: _buildInputDecoration(
+                    AppLocale.of(context).inputName, context, state),
+              ),
+              const SizedBox(height: 16),
               TextField(
                 controller: _urlController,
                 style: TextStyle(color: Colors.black.withOpacity(.8)),
@@ -79,7 +87,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (state is! BottomSheetError) {
       context
           .read<BottomSheetBloc>()
-          .add(PressAddButtonEvent(_urlController.text));
+          .add(PressAddButtonEvent(_urlController.text, _nameController.text));
     }
   }
 

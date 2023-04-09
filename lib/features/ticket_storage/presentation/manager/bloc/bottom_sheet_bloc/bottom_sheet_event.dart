@@ -7,6 +7,7 @@ class CreateBottomSheetEvent extends BottomSheetEvent{}
 
 class PressAddButtonEvent extends BottomSheetEvent{
   final String url;
+  final String ticketName;
 
-  PressAddButtonEvent(this.url);
+  PressAddButtonEvent(this.url, this.ticketName);
 }

@@ -33,7 +33,7 @@ class BottomSheetBloc extends Bloc<BottomSheetEvent, BottomSheetState> {
       final response = await _putTicket.call(PutTicketParams(
           ticket: TicketModel(
         url: event.url,
-        status: FileStatus.notUploaded,
+        status: FileStatus.notUploaded, ticketName: event.ticketName,
       )));
       //response.fold((failure) => null, (r) => null);
       emit(BottomSheetSuccess(event.url));

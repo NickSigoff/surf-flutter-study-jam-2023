@@ -15,9 +15,8 @@ class HideFloatingButtonEvent extends TicketStoragePageEvent {}
 
 class ShowFloatingButtonEvent extends TicketStoragePageEvent {}
 
-class UploadFileEvent extends TicketStoragePageEvent {
+class SetTicketStatus extends TicketStoragePageEvent {
   final TicketModel ticket;
-  final int index;
 
-  UploadFileEvent(this.ticket, this.index);
+  SetTicketStatus(this.ticket);
 }

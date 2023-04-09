@@ -11,5 +11,13 @@
 
    "waitingForDownload": "Ожидает начала загрузки",
 
+   "downloading": "Загружается",
+
+   "downloaded": "Загружен",
+
+   "ticket": "Билет",
+
+   "inputName": "Введите имя",
+
    "add": "Добавить"
 }

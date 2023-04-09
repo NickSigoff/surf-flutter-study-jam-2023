@@ -63,18 +63,21 @@ class _TicketStoragePageState extends State<TicketStoragePage> {
     );
   }
 
-  FloatingActionButton _buildFloatingActionButton(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () {
-        showModalBottomSheet(
-          context: context,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-          builder: (context) => BottomSheetWidget(),
-        );
-      },
-      isExtended: true,
-      child: Text(AppLocale.of(context).add),
+  Widget _buildFloatingActionButton(BuildContext context) {
+    return SizedBox(
+      width: 100,
+      child: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+            builder: (context) => const BottomSheetWidget(),
+          );
+        },
+        isExtended: true,
+        child: Text(AppLocale.of(context).add),
+      ),
     );
   }
 
@@ -89,9 +92,7 @@ class _TicketStoragePageState extends State<TicketStoragePage> {
         final maxOffset = _scrollController.position.maxScrollExtent;
         final scrollOffset = _scrollController.offset;
         if (scrollOffset < maxOffset) {
-          context
-              .read<TicketStoragePageBloc>()
-              .add(ShowFloatingButtonEvent());
+          context.read<TicketStoragePageBloc>().add(ShowFloatingButtonEvent());
         }
         return true;
       },

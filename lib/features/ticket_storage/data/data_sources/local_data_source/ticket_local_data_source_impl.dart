@@ -10,13 +10,14 @@ class TicketLocalDataSourceImpl implements TicketLocalDataSource {
   Future<List<TicketModel>> getAllTickets() async {
     try {
       final boxTickets = await Hive.openBox('Tickets');
-      final tickets = boxTickets.get('tickets');
+      final Map? tickets = boxTickets.get('tickets');
       List<TicketModel> result = [];
       if (tickets != null) {
-        for (int i = 0; i < tickets.length; i++) {
+        for (final value in tickets.values) {
           result.add(TicketModel(
-              url: tickets[i]['url'],
-              status: _getStatus(tickets[i]['status'])));
+              url: value['url'],
+              status: _getStatus(value['status']),
+              ticketName: value['ticketName']));
         }
       }
       return result;
@@ -37,9 +38,10 @@ class TicketLocalDataSourceImpl implements TicketLocalDataSource {
       final boxTickets = await Hive.openBox('Tickets');
       final tickets = boxTickets.get('tickets');
       if (tickets == null) {
-        await boxTickets.put('tickets', [ticket.toJson()]);
+        Map<String, dynamic> map = {ticket.url: ticket.toJson()};
+        await boxTickets.put('tickets', map);
       } else {
-        tickets.add(ticket.toJson());
+        tickets[ticket.url] = ticket.toJson();
         boxTickets.put('tickets', tickets);
       }
     } catch (e) {

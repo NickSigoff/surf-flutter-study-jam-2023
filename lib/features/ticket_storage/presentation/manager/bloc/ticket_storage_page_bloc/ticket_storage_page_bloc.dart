@@ -1,12 +1,7 @@
-import 'dart:io';
-
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:surf_flutter_study_jam_2023/core/error/failure.dart';
-import 'package:http/http.dart' as http;
-import 'package:surf_flutter_study_jam_2023/core/file_status.dart';
-
+import 'package:surf_flutter_study_jam_2023/features/ticket_storage/domain/use_cases/ticket_use_cases/put_ticket_use_case.dart';
 import '../../../../data/models/ticket_model.dart';
 import '../../../../domain/use_cases/ticket_use_cases/get_all_tickets_use_case.dart';
 
@@ -17,8 +12,9 @@ part 'ticket_storage_page_state.dart';
 class TicketStoragePageBloc
     extends Bloc<TicketStoragePageEvent, TicketStoragePageState> {
   final GetAllTickets _getAllTickets;
+  final PutTicket _putTicket;
 
-  TicketStoragePageBloc(this._getAllTickets)
+  TicketStoragePageBloc(this._getAllTickets, this._putTicket)
       : super(TicketStoragePageInitial()) {
     on<AddTicketToListEvent>((event, emit) {
       _onAddTicketToList(event, emit);
@@ -36,8 +32,8 @@ class TicketStoragePageBloc
       _onShowFloatingButton(event, emit);
     });
 
-    on<UploadFileEvent>((event, emit) async {
-      await _onUploadFileEvent(event, emit);
+    on<SetTicketStatus>((event, emit) async {
+      await _onSetTicketStatus(event, emit);
     });
   }
 
@@ -83,23 +79,12 @@ class TicketStoragePageBloc
     }
   }
 
-  Future<void> _onUploadFileEvent(
-      UploadFileEvent event, Emitter<TicketStoragePageState> emit) async {
-    final http.StreamedResponse response = await http.Client()
-        .send(http.Request('GET', Uri.parse(event.ticket.url)));
-    final total = response.contentLength ?? 0;
-
-    response.stream.listen((value) {
-      print(value);
-      // setState(() {
-      //   _bytes.addAll(value);
-      //   _received += value.length;
-      // });
-    }).onDone(() async {
-      final file = File('${(await getApplicationDocumentsDirectory()).path}/imagedd.png');
-      await file.writeAsBytes;
-      event.ticket.status = FileStatus.uploaded;
-
-    });
+  Future<void> _onSetTicketStatus(
+      SetTicketStatus event, Emitter<TicketStoragePageState> emit) async {
+    if (state is TicketStoragePageSuccess) {
+      final response =
+          await _putTicket.call(PutTicketParams(ticket: event.ticket));
+      emit((state as TicketStoragePageSuccess).copyWith());
+    }
   }
 }

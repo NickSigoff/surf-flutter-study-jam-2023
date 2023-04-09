@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
@@ -24,11 +22,7 @@ class TicketWidget extends StatefulWidget {
 }
 
 class _TicketWidgetState extends State<TicketWidget> {
-  double? progress = null;
-
-  String status = "Not Downloaded";
-
-  final url = 'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_1000MG.mp3';
+  double? progress;
 
   @override
   Widget build(BuildContext context) {
@@ -37,34 +31,47 @@ class _TicketWidgetState extends State<TicketWidget> {
       trailing: IconButton(
         icon: const Icon(Icons.cloud_download_outlined),
         onPressed: () {
+          widget._ticket.status = FileStatus.inProgress;
           _downloadButtonPressed();
         },
       ),
-      title: Column(
-        children: [
-          Text('Ticket ${widget._index}'),
-          LinearProgressIndicator(
-            value: progress,
-          ),
-          Text(AppLocale.of(context).waitingForDownload),
-        ],
-      ),
+      title: _getFileStatusWidget(widget._ticket.status, progress),
     );
   }
 
-  Widget _getFileStatusWidget(FileStatus status) {
+  Widget _getFileStatusWidget(FileStatus status, double? progress) {
     switch (status) {
       case FileStatus.uploaded:
-        return Container(
-          height: 5,
-          color: Colors.blueAccent,
+        return Column(
+          children: [
+            Text('${widget._ticket.ticketName} ${widget._index}'),
+            Container(
+              height: 5,
+              color: Colors.blueAccent,
+            ),
+            Text(AppLocale.of(context).downloaded),
+          ],
         );
       case FileStatus.inProgress:
-        return LinearProgressIndicator();
+        return Column(
+          children: [
+            Text('${widget._ticket.ticketName} ${widget._index}'),
+            LinearProgressIndicator(
+              value: progress,
+            ),
+            Text(AppLocale.of(context).downloading),
+          ],
+        );
       case FileStatus.notUploaded:
-        return Container(
-          height: 5,
-          color: Colors.grey,
+        return Column(
+          children: [
+            Text('${widget._ticket.ticketName} ${widget._index}'),
+            Container(
+              height: 5,
+              color: Colors.grey,
+            ),
+            Text(AppLocale.of(context).waitingForDownload),
+          ],
         );
     }
   }
@@ -73,64 +80,46 @@ class _TicketWidgetState extends State<TicketWidget> {
     setState(() {
       progress = null;
     });
-
-    final request = Request('GET', Uri.parse(url));
+    final request = Request('GET', Uri.parse(widget._ticket.url));
     final StreamedResponse response = await Client().send(request);
 
     final contentLength = response.contentLength;
+
     setState(() {
       progress = 0.000001;
-      status = "Download Started";
     });
 
     List<int> bytes = [];
 
-    // final file = await _getFile('video.mp4');
-    //
-    // response.stream.listen(
-    //   (List<int> newBytes) {
-    //     // update progress
-    //     bytes.addAll(newBytes);
-    //     final downloadedLength = bytes.length;
-    //     setState(() {
-    //       progress = downloadedLength.toDouble() / (contentLength ?? 1);
-    //       status = "Progress: ${((progress ?? 0) * 100).toStringAsFixed(2)} %";
-    //     });
-    //     print("progress: $progress");
-    //   },
-    //   onDone: () async {
-    //     // save file
-    //     setState(() {
-    //       progress = 1;
-    //       status = "Download Finished";
-    //     });
-    //     await file.writeAsBytes(bytes);
-    //
-    //     /// file has been downloaded
-    //     /// show success to user
-    //     debugPrint("Download finished");
-    //   },
-    //   onError: (e) {
-    //     /// if user loses internet connection while downloading the file, causes an error.
-    //     /// You can decide what to do about that in onError.
-    //     /// Setting cancelOnError to true will cause the StreamSubscription to get canceled.
-    //     debugPrint(e);
-    //   },
-    //   cancelOnError: true,
-    // );
+    final file = await _getFile('${widget._ticket.ticketName}.pdf');
 
-    final dir = await getTemporaryDirectory();
-   // File file =  File("${dir.path}/video.mp4");
-
-    Dio dio = Dio();
-    dio.download(
-      url,
-      '$dir/video.mp4',
-      onReceiveProgress: (received, total) {
+    response.stream.listen(
+      (List<int> newBytes) {
+        bytes.addAll(newBytes);
+        final downloadedLength = bytes.length;
         setState(() {
-          progress = ((received / total) * 100);
+          progress = downloadedLength.toDouble() / (contentLength ?? 1);
         });
       },
+      onDone: () async {
+        setState(() {
+          progress = 1;
+          widget._ticket.status = FileStatus.uploaded;
+          context
+              .read<TicketStoragePageBloc>()
+              .add(SetTicketStatus(widget._ticket));
+        });
+        await file.writeAsBytes(bytes);
+      },
+      onError: (e) {
+        debugPrint(e);
+      },
+      cancelOnError: true,
     );
+  }
+
+  Future<File> _getFile(String filename) async {
+    final dir = await getTemporaryDirectory();
+    return File("${dir.path}/$filename");
   }
 }

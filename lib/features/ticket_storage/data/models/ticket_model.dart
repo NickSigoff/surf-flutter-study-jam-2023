@@ -6,10 +6,12 @@ part 'ticket_model.g.dart';
 @JsonSerializable()
 class TicketModel {
   final String url;
+  final String ticketName;
   FileStatus status;
 
   TicketModel({
     required this.url,
+    required this.ticketName,
     required this.status,
   });
 

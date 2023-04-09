@@ -7,6 +7,7 @@ final _getIt = GetIt.instance;
 void setupBloc() {
   _getIt.registerFactory<TicketStoragePageBloc>(() => TicketStoragePageBloc(
         _getIt(),
+        _getIt(),
       ));
 
   _getIt.registerFactory<BottomSheetBloc>(() => BottomSheetBloc(
