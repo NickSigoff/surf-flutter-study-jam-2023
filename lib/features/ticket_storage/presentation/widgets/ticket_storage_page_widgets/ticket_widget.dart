@@ -26,7 +26,7 @@ class _TicketWidgetState extends State<TicketWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return ExpansionTile(
       leading: const Icon(Icons.airplane_ticket),
       trailing: IconButton(
         icon: const Icon(Icons.cloud_download_outlined),
@@ -36,6 +36,21 @@ class _TicketWidgetState extends State<TicketWidget> {
         },
       ),
       title: _getFileStatusWidget(widget._ticket.status, progress),
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(AppLocale.of(context).deleteTicket),
+            IconButton(
+                onPressed: () {
+                  context
+                      .read<TicketStoragePageBloc>()
+                      .add(RemoveTicketEvent(widget._index));
+                },
+                icon: const Icon(Icons.delete)),
+          ],
+        )
+      ],
     );
   }
 

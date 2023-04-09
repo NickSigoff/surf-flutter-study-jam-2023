@@ -15,6 +15,12 @@ class HideFloatingButtonEvent extends TicketStoragePageEvent {}
 
 class ShowFloatingButtonEvent extends TicketStoragePageEvent {}
 
+class RemoveTicketEvent extends TicketStoragePageEvent {
+  final int index;
+
+  RemoveTicketEvent(this.index);
+}
+
 class SetTicketStatus extends TicketStoragePageEvent {
   final TicketModel ticket;
 

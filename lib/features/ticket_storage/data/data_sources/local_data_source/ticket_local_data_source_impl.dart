@@ -27,9 +27,18 @@ class TicketLocalDataSourceImpl implements TicketLocalDataSource {
   }
 
   @override
-  Future<TicketModel> getTicket() {
-    // TODO: implement getTicket
-    throw UnimplementedError();
+  Future<void> putAllTickets(List<TicketModel> ticket) async {
+    try {
+      final boxTickets = await Hive.openBox('Tickets');
+
+      Map<String, dynamic> ticketsMap = {};
+      for (final ticketModel in ticket) {
+        ticketsMap[ticketModel.url] = ticketModel.toJson();
+      }
+      boxTickets.put('tickets', ticketsMap);
+    } catch (e) {
+      throw HiveException(e.toString());
+    }
   }
 
   @override

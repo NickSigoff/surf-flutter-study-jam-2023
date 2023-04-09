@@ -25,10 +25,10 @@ class TicketRepositoryImpl implements TicketRepository {
   }
 
   @override
-  Future<Either<Failure, TicketModel>> getTicket() async {
+  Future<Either<Failure, bool>> putAllTickets(List<TicketModel> tickets) async {
     try {
-      final ticket = await _ticketLocalDataSource.getTicket();
-      return Right(ticket);
+      await _ticketLocalDataSource.putAllTickets(tickets);
+      return const Right(true);
     } on HiveException catch (e) {
       return Left(HiveFailure(e.message));
     }

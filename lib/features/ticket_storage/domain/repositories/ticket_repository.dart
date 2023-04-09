@@ -7,5 +7,5 @@ abstract class TicketRepository {
 
   Future<Either<Failure, bool>> putTicket(TicketModel ticket);
 
-  Future<Either<Failure, TicketModel>> getTicket();
+  Future<Either<Failure, bool>> putAllTickets(List<TicketModel> ticket);
 }

@@ -5,14 +5,20 @@ import 'package:surf_flutter_study_jam_2023/features/ticket_storage/domain/repos
 import '../../../../../core/error/failure.dart';
 import '../../../../../core/use_case/use_case.dart';
 
-class GetTicket extends UseCaseWithoutParam<TicketModel> {
+class PutAllTickets extends UseCaseWithParam<bool,PutAllTicketsParams> {
   final TicketRepository _ticketRepository;
 
-  GetTicket({required TicketRepository ticketRepository})
+  PutAllTickets({required TicketRepository ticketRepository})
       : _ticketRepository = ticketRepository;
 
   @override
-  Future<Either<Failure, TicketModel>> call() async {
-    return await _ticketRepository.getTicket();
+  Future<Either<Failure, bool>> call(params) async {
+    return await _ticketRepository.putAllTickets(params.ticket);
   }
+}
+
+class PutAllTicketsParams {
+  final List<TicketModel> ticket;
+
+  PutAllTicketsParams({required this.ticket});
 }
