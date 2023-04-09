@@ -1,33 +1,58 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:regexed_validator/regexed_validator.dart';
+import 'package:surf_flutter_study_jam_2023/features/ticket_storage/data/models/ticket_model.dart';
+
+import '../../../../../../core/file_status.dart';
+import '../../../../domain/use_cases/ticket_use_cases/put_ticket_use_case.dart';
 
 part 'bottom_sheet_event.dart';
 
 part 'bottom_sheet_state.dart';
 
 class BottomSheetBloc extends Bloc<BottomSheetEvent, BottomSheetState> {
-  final _urlPattern =
-      r"(https?|http)://([-A-Z0-9.]+)(/[-A-Z0-9+&@#/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#/%=~_|!:‌​,.;]*)?";
+  final PutTicket _putTicket;
 
-  BottomSheetBloc() : super(BottomSheetInitial()) {
+  BottomSheetBloc(this._putTicket) : super(BottomSheetInitial()) {
     on<PressAddButtonEvent>((event, emit) async {
       await _onPressAddButton(event, emit);
+    });
+
+    on<CreateBottomSheetEvent>((event, emit) async {
+      await _onCreateBottomSheet(event, emit);
     });
   }
 
   Future<void> _onPressAddButton(
       PressAddButtonEvent event, Emitter<BottomSheetState> emit) async {
     emit(BottomSheetLoading());
-    RegExp regExp = RegExp(_urlPattern);
-    if (validator.email(event.url)) {
+    if (validator.url(event.url)) {
+      final response = await _putTicket.call(PutTicketParams(
+          ticket: TicketModel(
+        url: event.url,
+        status: FileStatus.notUploaded,
+      )));
+      //response.fold((failure) => null, (r) => null);
+      emit(BottomSheetSuccess(event.url));
+    } else {
       emit(BottomSheetError());
       await Future.delayed(const Duration(seconds: 2));
       emit(BottomSheetInitial());
-    } else {
-      emit(BottomSheetSuccess(event.url));
     }
+  }
+
+  Future<void> _onCreateBottomSheet(
+      CreateBottomSheetEvent event, Emitter<BottomSheetState> emit) async {
+    ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
+    String copiedData = '';
+    if (data != null && data.text != null) {
+      if (data.text!.contains('.pdf')) {
+        copiedData = data.text!;
+      }
+    }
+    emit(BottomSheetInitial(copiedData: copiedData));
   }
 }

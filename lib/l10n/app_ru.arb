@@ -5,5 +5,11 @@
 
    "inputCorrectUrl": "Введите корректный url",
 
+   "isNothingHere": "Здесь пока ничего нет",
+
+   "ticketAdded": "Билет добавлен",
+
+   "waitingForDownload": "Ожидает начала загрузки",
+
    "add": "Добавить"
 }

@@ -5,7 +5,11 @@ import 'package:surf_flutter_study_jam_2023/features/ticket_storage/presentation
 final _getIt = GetIt.instance;
 
 void setupBloc() {
-  _getIt.registerFactory<TicketStoragePageBloc>(() => TicketStoragePageBloc());
+  _getIt.registerFactory<TicketStoragePageBloc>(() => TicketStoragePageBloc(
+        _getIt(),
+      ));
 
-  _getIt.registerFactory<BottomSheetBloc>(() => BottomSheetBloc());
+  _getIt.registerFactory<BottomSheetBloc>(() => BottomSheetBloc(
+        _getIt(),
+      ));
 }

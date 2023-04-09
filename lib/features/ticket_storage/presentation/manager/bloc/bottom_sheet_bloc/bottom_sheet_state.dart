@@ -3,7 +3,11 @@ part of 'bottom_sheet_bloc.dart';
 @immutable
 abstract class BottomSheetState {}
 
-class BottomSheetInitial extends BottomSheetState {}
+class BottomSheetInitial extends BottomSheetState {
+  final String? copiedData;
+
+  BottomSheetInitial({this.copiedData});
+}
 
 class BottomSheetLoading extends BottomSheetState {}
 
