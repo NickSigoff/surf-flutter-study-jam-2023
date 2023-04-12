@@ -6,4 +6,6 @@ abstract class TicketLocalDataSource {
   Future<void> putTicket(TicketModel ticket);
 
   Future<void> putAllTickets(List<TicketModel> ticket);
+
+  Future<void> updateTicket(TicketModel ticket);
 }

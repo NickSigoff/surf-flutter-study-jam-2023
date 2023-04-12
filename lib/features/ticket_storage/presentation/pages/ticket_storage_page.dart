@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:surf_flutter_study_jam_2023/features/ticket_storage/presentation/manager/bloc/ticket_storage_page_bloc/ticket_storage_page_bloc.dart';
 import 'package:surf_flutter_study_jam_2023/features/ticket_storage/presentation/widgets/ticket_storage_page_widgets/bottom_sheet_widget.dart';
-
+import 'package:surf_flutter_study_jam_2023/di/di.dart' as di;
 import '../../../../core/app_locale.dart';
+import '../manager/bloc/ticket_bloc/ticket_bloc.dart';
 import '../widgets/ticket_storage_page_widgets/ticket_widget.dart';
 
 /// Экран “Хранения билетов”.
@@ -63,6 +64,54 @@ class _TicketStoragePageState extends State<TicketStoragePage> {
     );
   }
 
+  Widget _buildBody(TicketStoragePageState state) {
+    if (state is TicketStoragePageLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    if (state is TicketStoragePageSuccess) {
+      return _buildTicketsList(state);
+    }
+    return const SizedBox();
+  }
+
+  Widget _buildTicketsList(TicketStoragePageSuccess state) {
+    if (state.tickets.isEmpty) {
+      return Container(
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.airplane_ticket,
+              size: 60,
+            ),
+            Text(AppLocale.of(context).isNothingHere),
+          ],
+        ),
+      );
+    }
+    return NotificationListener(
+      onNotification: (t) {
+        final maxOffset = _scrollController.position.maxScrollExtent;
+        final scrollOffset = _scrollController.offset;
+        if (scrollOffset < maxOffset) {
+          context.read<TicketStoragePageBloc>().add(ShowFloatingButtonEvent());
+        }
+        return true;
+      },
+      child: ListView.builder(
+        controller: _scrollController,
+        itemCount: state.tickets.length,
+        itemBuilder: (context, index) => BlocProvider(
+          create: (_) => di.getIt.get<TicketBloc>(),
+          child: TicketWidget(ticket: state.tickets[index], index: index),
+        ),
+      ),
+    );
+  }
+
   Widget _buildFloatingActionButton(BuildContext context) {
     return SizedBox(
       width: 100,
@@ -79,40 +128,5 @@ class _TicketStoragePageState extends State<TicketStoragePage> {
         child: Text(AppLocale.of(context).add),
       ),
     );
-  }
-
-  Widget _buildTicketsList(TicketStoragePageSuccess state) {
-    if (state.tickets.isEmpty) {
-      return Center(
-        child: Text(AppLocale.of(context).isNothingHere),
-      );
-    }
-    return NotificationListener(
-      onNotification: (t) {
-        final maxOffset = _scrollController.position.maxScrollExtent;
-        final scrollOffset = _scrollController.offset;
-        if (scrollOffset < maxOffset) {
-          context.read<TicketStoragePageBloc>().add(ShowFloatingButtonEvent());
-        }
-        return true;
-      },
-      child: ListView.builder(
-          controller: _scrollController,
-          itemCount: state.tickets.length,
-          itemBuilder: (context, index) =>
-              TicketWidget(ticket: state.tickets[index], index: index)),
-    );
-  }
-
-  Widget _buildBody(TicketStoragePageState state) {
-    if (state is TicketStoragePageLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-    if (state is TicketStoragePageSuccess) {
-      return _buildTicketsList(state);
-    }
-    return const SizedBox();
   }
 }

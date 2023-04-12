@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:surf_flutter_study_jam_2023/core/file_status.dart';
 import 'package:surf_flutter_study_jam_2023/features/ticket_storage/presentation/manager/bloc/bottom_sheet_bloc/bottom_sheet_bloc.dart';
 import 'package:surf_flutter_study_jam_2023/features/ticket_storage/presentation/manager/bloc/ticket_storage_page_bloc/ticket_storage_page_bloc.dart';
-
 import '../../../../../core/app_locale.dart';
-import '../../../data/models/ticket_model.dart';
+
 
 class BottomSheetWidget extends StatefulWidget {
   const BottomSheetWidget({Key? key}) : super(key: key);
@@ -41,11 +39,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
             );
             context.read<TicketStoragePageBloc>().add(
                   AddTicketToListEvent(
-                    TicketModel(
-                      url: state.url,
-                      status: FileStatus.notUploaded,
-                      ticketName: _nameController.text,
-                    ),
+                    url: _urlController.text,
+                    name: _nameController.text,
                   ),
                 );
           }
@@ -61,7 +56,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 controller: _nameController,
                 style: TextStyle(color: Colors.black.withOpacity(.8)),
                 decoration: _buildInputDecoration(
-                    AppLocale.of(context).inputName, context, state),
+                    AppLocale.of(context).inputName, context, state, true),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -92,17 +87,19 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   }
 
   InputDecoration _buildInputDecoration(
-      String labelText, BuildContext context, BottomSheetState state) {
+      String labelText, BuildContext context, BottomSheetState state,
+      [bool isName = false]) {
     return InputDecoration(
       errorBorder: state is BottomSheetError
           ? OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
                 color: Theme.of(context).colorScheme.error,
                 width: 2,
               ),
             )
           : null,
-      errorText: state is BottomSheetError
+      errorText: state is BottomSheetError && !isName
           ? AppLocale.of(context).inputCorrectUrl
           : null,
       fillColor: Theme.of(context).colorScheme.surface,

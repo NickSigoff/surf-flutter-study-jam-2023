@@ -2,6 +2,8 @@ import 'package:get_it/get_it.dart';
 import 'package:surf_flutter_study_jam_2023/features/ticket_storage/presentation/manager/bloc/bottom_sheet_bloc/bottom_sheet_bloc.dart';
 import 'package:surf_flutter_study_jam_2023/features/ticket_storage/presentation/manager/bloc/ticket_storage_page_bloc/ticket_storage_page_bloc.dart';
 
+import '../features/ticket_storage/presentation/manager/bloc/ticket_bloc/ticket_bloc.dart';
+
 final _getIt = GetIt.instance;
 
 void setupBloc() {
@@ -12,6 +14,10 @@ void setupBloc() {
       ));
 
   _getIt.registerFactory<BottomSheetBloc>(() => BottomSheetBloc(
+        _getIt(),
+      ));
+
+  _getIt.registerFactory<TicketBloc>(() => TicketBloc(
         _getIt(),
       ));
 }

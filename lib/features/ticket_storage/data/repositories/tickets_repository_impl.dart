@@ -43,4 +43,14 @@ class TicketRepositoryImpl implements TicketRepository {
       return Left(HiveFailure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> updateTicket(TicketModel ticket) async{
+    try {
+      await _ticketLocalDataSource.updateTicket(ticket);
+      return const Right(true);
+    } on HiveException catch (e) {
+      return Left(HiveFailure(e.message));
+    }
+  }
 }

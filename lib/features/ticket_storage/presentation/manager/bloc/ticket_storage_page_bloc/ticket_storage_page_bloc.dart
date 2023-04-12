@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:surf_flutter_study_jam_2023/core/error/failure.dart';
 import 'package:surf_flutter_study_jam_2023/features/ticket_storage/domain/use_cases/ticket_use_cases/put_ticket_use_case.dart';
+import 'package:uuid/uuid.dart';
 import '../../../../data/models/ticket_model.dart';
 import '../../../../domain/use_cases/ticket_use_cases/get_all_tickets_use_case.dart';
 import '../../../../domain/use_cases/ticket_use_cases/put_all_tickets_use_case.dart';
@@ -19,8 +20,8 @@ class TicketStoragePageBloc
   TicketStoragePageBloc(
       this._getAllTickets, this._putTicket, this._putAllTickets)
       : super(TicketStoragePageInitial()) {
-    on<AddTicketToListEvent>((event, emit) {
-      _onAddTicketToList(event, emit);
+    on<AddTicketToListEvent>((event, emit) async {
+      await _onAddTicketToList(event, emit);
     });
 
     on<CreateTicketPageEvent>((event, emit) async {
@@ -35,19 +36,24 @@ class TicketStoragePageBloc
       _onShowFloatingButton(event, emit);
     });
 
-    on<SetTicketStatus>((event, emit) async {
-      await _onSetTicketStatus(event, emit);
-    });
-
     on<RemoveTicketEvent>((event, emit) async {
       await _onRemoveTicket(event, emit);
     });
   }
 
-  void _onAddTicketToList(
-      AddTicketToListEvent event, Emitter<TicketStoragePageState> emit) {
+  Future<void> _onAddTicketToList(
+      AddTicketToListEvent event, Emitter<TicketStoragePageState> emit) async {
+    const uuid = Uuid();
     if (state is TicketStoragePageSuccess) {
-      (state as TicketStoragePageSuccess).tickets.add(event.ticket);
+      final ticket = TicketModel(
+          url: event.url,
+          ticketName: event.name,
+          id: uuid.v4(),
+          dateCreating: DateTime.now());
+      final response = await _putTicket.call(PutTicketParams(ticket: ticket));
+      //response.fold((failure) => null, (r) => null);
+
+      (state as TicketStoragePageSuccess).tickets.add(ticket);
       emit((state as TicketStoragePageSuccess).copyWith());
     }
   }
@@ -83,15 +89,6 @@ class TicketStoragePageBloc
     if (state is TicketStoragePageSuccess) {
       emit((state as TicketStoragePageSuccess)
           .copyWith(isFloatingButtonVisible: true));
-    }
-  }
-
-  Future<void> _onSetTicketStatus(
-      SetTicketStatus event, Emitter<TicketStoragePageState> emit) async {
-    if (state is TicketStoragePageSuccess) {
-      final response =
-          await _putTicket.call(PutTicketParams(ticket: event.ticket));
-      emit((state as TicketStoragePageSuccess).copyWith());
     }
   }
 

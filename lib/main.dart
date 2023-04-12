@@ -1,10 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:surf_flutter_study_jam_2023/di/di.dart' as di;
-
+import 'features/ticket_storage/data/models/ticket_model.dart';
 import 'features/ticket_storage/presentation/widgets/material_app_widget.dart';
 
 void main() async {
@@ -12,6 +11,7 @@ void main() async {
   await di.init();
   final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentsDir.path);
+  Hive.registerAdapter(TicketModelAdapter());
   //Hive.deleteBoxFromDisk('Tickets');
   runApp(const MyApp());
 }

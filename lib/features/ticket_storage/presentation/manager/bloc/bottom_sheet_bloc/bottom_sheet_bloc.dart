@@ -1,12 +1,8 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:regexed_validator/regexed_validator.dart';
-import 'package:surf_flutter_study_jam_2023/features/ticket_storage/data/models/ticket_model.dart';
-
-import '../../../../../../core/file_status.dart';
 import '../../../../domain/use_cases/ticket_use_cases/put_ticket_use_case.dart';
 
 part 'bottom_sheet_event.dart';
@@ -30,12 +26,6 @@ class BottomSheetBloc extends Bloc<BottomSheetEvent, BottomSheetState> {
       PressAddButtonEvent event, Emitter<BottomSheetState> emit) async {
     emit(BottomSheetLoading());
     if (validator.url(event.url)) {
-      final response = await _putTicket.call(PutTicketParams(
-          ticket: TicketModel(
-        url: event.url,
-        status: FileStatus.notUploaded, ticketName: event.ticketName,
-      )));
-      //response.fold((failure) => null, (r) => null);
       emit(BottomSheetSuccess(event.url));
     } else {
       emit(BottomSheetError());
