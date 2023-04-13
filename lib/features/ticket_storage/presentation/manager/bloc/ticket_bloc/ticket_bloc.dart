@@ -58,7 +58,7 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
   }
 
   Future<File> _getFile(String filename) async {
-    final dir = await getTemporaryDirectory();
+    final dir = await getApplicationDocumentsDirectory();
     return File("${dir.path}/$filename");
   }
 

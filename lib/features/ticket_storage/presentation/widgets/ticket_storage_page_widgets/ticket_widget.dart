@@ -5,6 +5,8 @@ import 'package:surf_flutter_study_jam_2023/features/ticket_storage/data/models/
 import 'package:surf_flutter_study_jam_2023/features/ticket_storage/presentation/manager/bloc/ticket_bloc/ticket_bloc.dart';
 import 'package:surf_flutter_study_jam_2023/features/ticket_storage/presentation/manager/bloc/ticket_storage_page_bloc/ticket_storage_page_bloc.dart';
 
+import '../../pages/pdf_page.dart';
+
 class TicketWidget extends StatefulWidget {
   final TicketModel _ticket;
   final int _index;
@@ -29,44 +31,46 @@ class _TicketWidgetState extends State<TicketWidget> {
   Widget build(BuildContext context) {
     return BlocBuilder<TicketBloc, TicketState>(
       builder: (context, state) {
-        return Dismissible(
-          key: ValueKey(widget._ticket.id),
-          onDismissed: (direction) {
-            context
-                .read<TicketStoragePageBloc>()
-                .add(RemoveTicketEvent(widget._index));
+        return GestureDetector(
+          onTap: () {
+            if (state is TicketLoaded) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (BuildContext context) {
+                  return PdfPage(path: state.filePath);
+                }),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  duration: const Duration(seconds: 5),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                  content: Text('Файл не загружен'),
+                ),
+              );
+            }
           },
-          child: ListTile(
-            leading: const Icon(Icons.airplane_ticket),
-            // onTap: () {
-            //   if (state is TicketLoaded) {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(builder: (BuildContext context) {
-            //         return PdfPage(path: state.filePath);
-            //       }),
-            //     );
-            //   } else {
-            //     ScaffoldMessenger.of(context).showSnackBar(
-            //       SnackBar(
-            //         duration: const Duration(seconds: 5),
-            //         backgroundColor: Theme.of(context).colorScheme.error,
-            //         content: Text('Файл не загружен'),
-            //       ),
-            //     );
-            //   }
-            // },
-            trailing: IconButton(
-              icon: _getIcon(state),
-              onPressed: () {
-                if (state is! TicketLoading) {
-                  context.read<TicketBloc>().add(LoadEvent(
-                        widget._ticket,
-                      ));
-                }
-              },
+          child: Dismissible(
+            key: ValueKey(widget._ticket.id),
+            onDismissed: (direction) {
+              context
+                  .read<TicketStoragePageBloc>()
+                  .add(RemoveTicketEvent(widget._index));
+            },
+            child: ListTile(
+              leading: const Icon(Icons.airplane_ticket),
+              trailing: IconButton(
+                icon: _getIcon(state),
+                onPressed: () {
+                  if (state is! TicketLoading) {
+                    context.read<TicketBloc>().add(LoadEvent(
+                          widget._ticket,
+                        ));
+                  }
+                },
+              ),
+              title: _getFileStatusWidget(state, context),
             ),
-            title: _getFileStatusWidget(state, context),
           ),
         );
       },
